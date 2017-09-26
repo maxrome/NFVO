@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.openbaton.catalogue.mano.common.DeploymentFlavour;
 import org.openbaton.catalogue.mano.common.Ip;
 import org.openbaton.catalogue.mano.descriptor.VNFComponent;
@@ -1455,7 +1457,6 @@ public class GenericVIM extends Vim {
         throw new VimException(e);
       }
     }
-
     log.info("Launched VNFCInstance: " + vnfcInstance + " on VimInstance " + vimInstance.getName());
     return new AsyncResult<>(vnfcInstance);
   }
@@ -1516,21 +1517,34 @@ public class GenericVIM extends Vim {
     vnfcInstance.setFloatingIps(new HashSet<Ip>());
 
     if (!floatingIps.isEmpty()) {
-      for (Entry<String, String> fip : server.getFloatingIps().entrySet()) {
-        Ip ip = new Ip();
-        ip.setNetName(fip.getKey());
-        ip.setIp(fip.getValue());
-        vnfcInstance.getFloatingIps().add(ip);
+      for (VNFDConnectionPoint vnfdConnectionPoint : vnfComponent.getConnection_point()) {
+        Pattern p =
+            Pattern.compile(vnfdConnectionPoint.getVirtual_link_reference() + "-(\\d{5,7})");
+        for (Entry<String, String> fip : server.getFloatingIps().entrySet()) {
+          Matcher m = p.matcher(fip.getKey());
+          if (m.matches()) {
+            Ip ip = new Ip();
+            ip.setNetName(vnfdConnectionPoint.getVirtual_link_reference());
+            ip.setIp(fip.getValue());
+            vnfcInstance.getFloatingIps().add(ip);
+          }
+        }
       }
     }
 
-    for (Entry<String, List<String>> network : server.getIps().entrySet()) {
-      Ip ip = new Ip();
-      ip.setNetName(network.getKey());
-      ip.setIp(network.getValue().iterator().next());
-      vnfcInstance.getIps().add(ip);
-      for (String ip1 : server.getIps().get(network.getKey())) {
-        vnfr.getVnf_address().add(ip1);
+    for (VNFDConnectionPoint vnfdConnectionPoint : vnfComponent.getConnection_point()) {
+      Pattern p = Pattern.compile(vnfdConnectionPoint.getVirtual_link_reference() + "-(\\d{5,7})");
+      for (Entry<String, List<String>> network : server.getIps().entrySet()) {
+        Matcher m = p.matcher(network.getKey());
+        if (m.matches()) {
+          Ip ip = new Ip();
+          ip.setNetName(vnfdConnectionPoint.getVirtual_link_reference());
+          ip.setIp(network.getValue().iterator().next());
+          vnfcInstance.getIps().add(ip);
+          for (String ip1 : server.getIps().get(network.getKey())) {
+            vnfr.getVnf_address().add(ip1);
+          }
+        }
       }
     }
     return vnfcInstance;

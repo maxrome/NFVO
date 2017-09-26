@@ -1105,6 +1105,7 @@ public class NetworkServiceRecordManagement
     // this while loop is necessary, because while creating the NSR also a VIM might be changed (newly created
     // networks).
     // then saving the NSR might produce OptimisticLockingFailureExceptions.
+    int tempNsrId = ((int) (Math.random() * 10000000));
     while (!savedNsrSuccessfully) {
       networkServiceRecord = NSRUtils.createNetworkServiceRecord(networkServiceDescriptor);
       SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss z");
@@ -1178,12 +1179,13 @@ public class NetworkServiceRecordManagement
                 boolean networkExists = false;
                 if (vimInstance.getNetworks() == null) {
                   throw new VimException(
-                      "VIM instance " + vimInstance.getName() + "does not have networks ");
+                      "VIM instance " + vimInstance.getName() + " does not have networks ");
                 }
                 for (Network network : vimInstance.getNetworks()) {
                   //                    if (network.getName().equals(vlr.getName()) || network.getExtId().equals(vlr
                   // .getName())) {
-                  if (isVNFDConnectionPointExisting(vnfdConnectionPoint, network)) {
+                  if (isVNFDConnectionPointExisting(
+                      String.valueOf(tempNsrId), vnfdConnectionPoint, network)) {
                     networkExists = true;
                     vnfdConnectionPoint.setVirtual_link_reference_id(network.getExtId());
                     break;
@@ -1191,11 +1193,14 @@ public class NetworkServiceRecordManagement
                 }
                 if (!networkExists) {
                   Network network = new Network();
-                  network.setName(vnfdConnectionPoint.getVirtual_link_reference());
+                  network.setName(
+                      vnfdConnectionPoint.getVirtual_link_reference() + "-" + tempNsrId);
                   HashSet<Subnet> subnets = new HashSet<>();
                   Subnet subnet = new Subnet();
                   subnet.setName(
-                      String.format("%s_subnet", vnfdConnectionPoint.getVirtual_link_reference()));
+                      String.format(
+                          "%s_subnet",
+                          vnfdConnectionPoint.getVirtual_link_reference() + "-" + tempNsrId));
                   subnet.setCidr(
                       getCidrFromVLName(
                           vnfdConnectionPoint.getVirtual_link_reference(),
@@ -1204,6 +1209,7 @@ public class NetworkServiceRecordManagement
                   subnets.add(subnet);
                   network.setSubnets(subnets);
                   network = networkManagement.add(vimInstance, network);
+                  network.setName(vnfdConnectionPoint.getVirtual_link_reference());
                   vnfdConnectionPoint.setVirtual_link_reference_id(network.getExtId());
                 }
                 //       }
@@ -1251,8 +1257,8 @@ public class NetworkServiceRecordManagement
   }
 
   private boolean isVNFDConnectionPointExisting(
-      VNFDConnectionPoint vnfdConnectionPoint, Network network) {
-    if (network.getName().equals(vnfdConnectionPoint.getVirtual_link_reference())
+      String nsr_id, VNFDConnectionPoint vnfdConnectionPoint, Network network) {
+    if (network.getName().equals(vnfdConnectionPoint.getVirtual_link_reference() + "-" + nsr_id)
         || network.getExtId().equals(vnfdConnectionPoint.getVirtual_link_reference())) {
       if (vnfdConnectionPoint.getFixedIp() != null
           && !vnfdConnectionPoint.getFixedIp().equals("")) {
