@@ -238,12 +238,12 @@ public class VirtualLinkManagementClassSuiteTest {
           {
             LifecycleEvent lifecycleEvent = new LifecycleEvent();
             lifecycleEvent.setEvent(Event.INSTANTIATE);
-            lifecycleEvent.setLifecycle_events(
+           /* lifecycleEvent.setLifecycle_events(
                 new LinkedHashSet<String>() {
                   {
                     add("command");
                   }
-                });
+                });*/
             add(lifecycleEvent);
           }
         });

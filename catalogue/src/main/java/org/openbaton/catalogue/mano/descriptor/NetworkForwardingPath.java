@@ -17,10 +17,11 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
-import java.io.Serializable;
+import org.openbaton.catalogue.util.BaseEntity;
+
 import java.util.List;
 import javax.persistence.*;
-import org.openbaton.catalogue.util.IdGenerator;
+//import org.openbaton.catalogue.util.BaseEntity;
 
 /**
  * Created by lto on 06/02/15.
@@ -45,17 +46,6 @@ public class NetworkForwardingPath extends BaseEntity {
 
   public NetworkForwardingPath() {}
 
-  @Override
-  public String toString() {
-    return "NetworkForwardingPath{"
-        + "policy="
-        + policy
-        + ", connection="
-        + connection
-        + "} "
-        + super.toString();
-  }
-
   public Policy getPolicy() {
     return policy;
   }
@@ -72,18 +62,11 @@ public class NetworkForwardingPath extends BaseEntity {
     this.connections = connections;
   }
 
-  @java.lang.Override
-  public java.lang.String toString() {
-    return "NetworkForwardingPath{"
-        + "id='"
-        + id
-        + '\''
-        + ", version="
-        + version
-        + ", policy="
-        + policy
-        + ", connections="
-        + connections
-        + '}';
+  @Override
+  public String toString() {
+    return "NetworkForwardingPath{" +
+            "policy=" + policy +
+            ", connections=" + connections +
+            "} " + super.toString();
   }
 }

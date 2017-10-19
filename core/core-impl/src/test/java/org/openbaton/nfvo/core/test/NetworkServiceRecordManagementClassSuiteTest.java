@@ -310,7 +310,7 @@ public class NetworkServiceRecordManagementClassSuiteTest {
         networkServiceDescriptor.getVnfd().iterator().next();
     LifecycleEvent event = new LifecycleEvent();
     event.setEvent(Event.INSTANTIATE);
-    event.setLifecycle_events(new LinkedHashSet<>());
+    //event.setLifecycle_events(new LinkedHashSet<>());
     event.getLifecycle_events().add("command_1");
     virtualNetworkFunctionDescriptor.getLifecycle_event().add(event);
     final VimInstance vimInstance = createVimInstance();
@@ -369,7 +369,7 @@ public class NetworkServiceRecordManagementClassSuiteTest {
         networkServiceDescriptor.getVnfd().iterator().next();
     LifecycleEvent event = new LifecycleEvent();
     event.setEvent(Event.ALLOCATE);
-    event.setLifecycle_events(new LinkedHashSet<>());
+    //event.setLifecycle_events(new LinkedHashSet<>());
     event.getLifecycle_events().add("command_1");
     virtualNetworkFunctionDescriptor.getLifecycle_event().add(event);
     final VimInstance vimInstance = createVimInstance();

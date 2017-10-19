@@ -17,15 +17,18 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
-import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import org.openbaton.catalogue.mano.common.ConnectionPoint;
 import org.openbaton.catalogue.mano.common.CostituentVNF;
 import org.openbaton.catalogue.mano.common.Security;
 import org.openbaton.catalogue.util.BaseEntity;
+
+import java.util.Set;
+import javax.persistence.*;
+//import org.openbaton.catalogue.util.BaseEntity;
+//import org.openbaton.catalogue.mano.common.ConnectionPoint;
+//import org.openbaton.catalogue.mano.common.CostituentVNF;
+//import org.openbaton.catalogue.mano.common.Security;
+
 
 /**
  * Created by lto on 05/02/15.
@@ -35,13 +38,9 @@ import org.openbaton.catalogue.util.BaseEntity;
 @Entity
 public class VNFForwardingGraphDescriptor extends BaseEntity {
 
-  /** ID of the VNFFG Descriptor */
-  @Id private String id;
-
   /* * Specify the symmetricity of the VNFFG */
   private boolean symmetrical;
 
-  @Version private int hb_version = 0;
   /** Specify the vendor generating this VNFFG */
   private String vendor;
   /**
@@ -177,13 +176,9 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
   @Override
   public String toString() {
     return "VNFForwardingGraphDescriptor{"
-        + "id='"
-        + id
         + '\''
         + ", symmetrical="
         + symmetrical
-        + ", hb_version="
-        + hb_version
         + ", vendor='"
         + vendor
         + '\''
