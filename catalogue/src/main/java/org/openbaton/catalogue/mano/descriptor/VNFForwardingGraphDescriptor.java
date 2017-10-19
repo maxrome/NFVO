@@ -35,6 +35,13 @@ import org.openbaton.catalogue.util.BaseEntity;
 @Entity
 public class VNFForwardingGraphDescriptor extends BaseEntity {
 
+  /** ID of the VNFFG Descriptor */
+  @Id private String id;
+
+  /* * Specify the symmetricity of the VNFFG */
+  private boolean symmetrical;
+
+  @Version private int hb_version = 0;
   /** Specify the vendor generating this VNFFG */
   private String vendor;
   /**
@@ -93,6 +100,14 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
 
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  public boolean isSymmetrical() {
+    return symmetrical;
+  }
+
+  public void setSymmetricity(boolean sym) {
+    this.symmetrical = sym;
   }
 
   public int getNumber_of_endpoints() {
@@ -162,7 +177,14 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
   @Override
   public String toString() {
     return "VNFForwardingGraphDescriptor{"
-        + "vendor='"
+        + "id='"
+        + id
+        + '\''
+        + ", symmetrical="
+        + symmetrical
+        + ", hb_version="
+        + hb_version
+        + ", vendor='"
         + vendor
         + '\''
         + ", version='"

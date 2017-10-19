@@ -17,13 +17,10 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
-import java.util.Map;
-import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
-import org.openbaton.catalogue.util.BaseEntity;
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.*;
+import org.openbaton.catalogue.util.IdGenerator;
 
 /**
  * Created by lto on 06/02/15.
@@ -39,8 +36,12 @@ public class NetworkForwardingPath extends BaseEntity {
   /**
    * A tuple containing a reference to a Connection Point in the NFP and the position in the path
    */
-  @ElementCollection(fetch = FetchType.EAGER)
-  private Map<String, String> connection;
+  //@ElementCollection(fetch = FetchType.EAGER)
+  //private Map<String, String> connection;
+
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinColumn(name = "NetworkForwardingPathId")
+  private List<Connection> connections;
 
   public NetworkForwardingPath() {}
 
@@ -63,11 +64,26 @@ public class NetworkForwardingPath extends BaseEntity {
     this.policy = policy;
   }
 
-  public Map<String, String> getConnection() {
-    return connection;
+  public List<Connection> getConnections() {
+    return connections;
   }
 
-  public void setConnection(Map<String, String> connection) {
-    this.connection = connection;
+  public void setConnections(List<Connection> connections) {
+    this.connections = connections;
+  }
+
+  @java.lang.Override
+  public java.lang.String toString() {
+    return "NetworkForwardingPath{"
+        + "id='"
+        + id
+        + '\''
+        + ", version="
+        + version
+        + ", policy="
+        + policy
+        + ", connections="
+        + connections
+        + '}';
   }
 }

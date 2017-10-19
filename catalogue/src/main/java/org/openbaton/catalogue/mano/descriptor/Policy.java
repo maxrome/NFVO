@@ -29,8 +29,31 @@ import org.openbaton.catalogue.util.BaseEntity;
  */
 @Entity
 public class Policy extends BaseEntity {
-  @Override
-  public String toString() {
-    return "Policy{} " + super.toString();
+
+  @Id private String id;
+  @Version private int version = 0;
+  private ACLMatchingCriteria acl_matching_criteria;
+  public Policy() {}
+
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  @PrePersist
+  public void ensureId() {
+    id = IdGenerator.createUUID();
+  }
+
+  public ACLMatchingCriteria getAcl_matching_criteria() {
+    return acl_matching_criteria;
+  }
+
+  public void setAcl_matching_criteria(ACLMatchingCriteria acl_matching_criteria) {
+    this.acl_matching_criteria = acl_matching_criteria;
   }
 }
