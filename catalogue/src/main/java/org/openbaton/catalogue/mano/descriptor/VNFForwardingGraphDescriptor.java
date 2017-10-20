@@ -17,18 +17,16 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
+import java.util.Set;
+import javax.persistence.*;
 import org.openbaton.catalogue.mano.common.ConnectionPoint;
 import org.openbaton.catalogue.mano.common.CostituentVNF;
 import org.openbaton.catalogue.mano.common.Security;
 import org.openbaton.catalogue.util.BaseEntity;
-
-import java.util.Set;
-import javax.persistence.*;
 //import org.openbaton.catalogue.util.BaseEntity;
 //import org.openbaton.catalogue.mano.common.ConnectionPoint;
 //import org.openbaton.catalogue.mano.common.CostituentVNF;
 //import org.openbaton.catalogue.mano.common.Security;
-
 
 /**
  * Created by lto on 05/02/15.

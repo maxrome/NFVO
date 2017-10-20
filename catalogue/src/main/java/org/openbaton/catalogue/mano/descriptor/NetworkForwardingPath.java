@@ -17,12 +17,9 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
-import org.openbaton.catalogue.util.BaseEntity;
-
 import java.util.List;
 import javax.persistence.*;
-//import org.openbaton.catalogue.util.BaseEntity;
-
+import org.openbaton.catalogue.util.BaseEntity;
 /**
  * Created by lto on 06/02/15.
  *
@@ -64,9 +61,12 @@ public class NetworkForwardingPath extends BaseEntity {
 
   @Override
   public String toString() {
-    return "NetworkForwardingPath{" +
-            "policy=" + policy +
-            ", connections=" + connections +
-            "} " + super.toString();
+    return "NetworkForwardingPath{"
+        + "policy="
+        + policy
+        + ", connections="
+        + connections
+        + "} "
+        + super.toString();
   }
 }

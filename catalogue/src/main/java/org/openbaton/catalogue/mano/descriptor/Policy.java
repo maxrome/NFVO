@@ -18,12 +18,7 @@
 package org.openbaton.catalogue.mano.descriptor;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Version;
-
 import org.openbaton.catalogue.util.BaseEntity;
-import org.openbaton.catalogue.util.IdGenerator;
 
 /**
  * Created by lto on 06/02/15.
@@ -36,6 +31,7 @@ import org.openbaton.catalogue.util.IdGenerator;
 public class Policy extends BaseEntity {
 
   private ACLMatchingCriteria acl_matching_criteria;
+
   public ACLMatchingCriteria getAcl_matching_criteria() {
     return acl_matching_criteria;
   }
@@ -46,8 +42,6 @@ public class Policy extends BaseEntity {
 
   @Override
   public String toString() {
-    return "Policy{" +
-            "acl_matching_criteria=" + acl_matching_criteria +
-            "} " + super.toString();
+    return "Policy{" + "acl_matching_criteria=" + acl_matching_criteria + "} " + super.toString();
   }
 }
