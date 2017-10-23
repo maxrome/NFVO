@@ -17,9 +17,10 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
-import java.util.List;
+import java.util.Set;
 import javax.persistence.*;
 import org.openbaton.catalogue.util.BaseEntity;
+
 /**
  * Created by lto on 06/02/15.
  *
@@ -39,7 +40,8 @@ public class NetworkForwardingPath extends BaseEntity {
 
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinColumn(name = "NetworkForwardingPathId")
-  private List<Connection> connections;
+  @OrderBy("id")
+  private Set<Connection> connections;
 
   public NetworkForwardingPath() {}
 
@@ -51,11 +53,11 @@ public class NetworkForwardingPath extends BaseEntity {
     this.policy = policy;
   }
 
-  public List<Connection> getConnections() {
+  public Set<Connection> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<Connection> connections) {
+  public void setConnections(Set<Connection> connections) {
     this.connections = connections;
   }
 

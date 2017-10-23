@@ -17,11 +17,9 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
-import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import org.openbaton.catalogue.util.BaseEntity;
 
 /**
  * Created by lto on 06/02/15.
@@ -31,10 +29,9 @@ import javax.persistence.Version;
  * <p>A policy or rule to apply to the NFP
  */
 @Entity
-public class Connection implements Serializable {
+public class Connection extends BaseEntity {
 
-  @Version private int version = 0;
-  @Id private String id;
+  private String pathIndex;
 
   private String vnf_name;
 
@@ -42,12 +39,12 @@ public class Connection implements Serializable {
 
   public Connection() {}
 
-  public String getId() {
-    return id;
+  public String getPathIndex() {
+    return pathIndex;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setPathIndex(String pathIndex) {
+    this.pathIndex = pathIndex;
   }
 
   public String getVnf_name() {
@@ -69,10 +66,8 @@ public class Connection implements Serializable {
   @Override
   public String toString() {
     return "Connection{"
-        + "version="
-        + version
-        + ", id='"
-        + id
+        + ", pathIndex='"
+        + pathIndex
         + '\''
         + ", vnf_name='"
         + vnf_name
@@ -80,7 +75,8 @@ public class Connection implements Serializable {
         + ", virtual_link='"
         + virtual_link
         + '\''
-        + '}';
+        + "}"
+        + super.toString();
   }
 
   @Override
@@ -88,12 +84,13 @@ public class Connection implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Connection that = (Connection) o;
-    return Objects.equals(vnf_name, that.vnf_name)
+    return Objects.equals(pathIndex, that.pathIndex)
+        && Objects.equals(vnf_name, that.vnf_name)
         && Objects.equals(virtual_link, that.virtual_link);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(vnf_name, virtual_link);
+    return Objects.hash(pathIndex, vnf_name, virtual_link);
   }
 }
