@@ -40,7 +40,7 @@ public class NetworkForwardingPath extends BaseEntity {
 
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinColumn(name = "NetworkForwardingPathId")
-  @OrderBy("id")
+  @OrderBy("pathIndex")
   private Set<Connection> connections;
 
   public NetworkForwardingPath() {}

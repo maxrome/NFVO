@@ -31,7 +31,7 @@ import org.openbaton.catalogue.util.BaseEntity;
 @Entity
 public class Connection extends BaseEntity {
 
-  private String pathIndex;
+  private Integer path_index;
 
   private String vnf_name;
 
@@ -39,12 +39,12 @@ public class Connection extends BaseEntity {
 
   public Connection() {}
 
-  public String getPathIndex() {
-    return pathIndex;
+  public Integer getPathIndex() {
+    return path_index;
   }
 
-  public void setPathIndex(String pathIndex) {
-    this.pathIndex = pathIndex;
+  public void setPathIndex(Integer path_index) {
+    this.path_index = path_index;
   }
 
   public String getVnf_name() {
@@ -66,8 +66,8 @@ public class Connection extends BaseEntity {
   @Override
   public String toString() {
     return "Connection{"
-        + ", pathIndex='"
-        + pathIndex
+        + ", path_index='"
+        + path_index
         + '\''
         + ", vnf_name='"
         + vnf_name
@@ -84,13 +84,13 @@ public class Connection extends BaseEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Connection that = (Connection) o;
-    return Objects.equals(pathIndex, that.pathIndex)
+    return Objects.equals(path_index, that.path_index)
         && Objects.equals(vnf_name, that.vnf_name)
         && Objects.equals(virtual_link, that.virtual_link);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(pathIndex, vnf_name, virtual_link);
+    return Objects.hash(path_index, vnf_name, virtual_link);
   }
 }

@@ -13,13 +13,17 @@ public class ACLMatchingCriteria implements Serializable {
   @Id private String id;
   @Version private int version = 0;
 
-  private String source_ip;
+  //should be a CIDR (eg. 192.168.1.11/32)
+  private String source_ip_prefix;
 
-  private String destination_ip;
+  //should be a CIDR (eg. 192.168.1.11/32)
+  private String destination_ip_prefix;
 
-  private int source_port;
+  private int source_port_min;
+  private int source_port_max;
 
-  private int destination_port;
+  private int destination_port_min;
+  private int destination_port_max;
 
   private int protocol;
 
@@ -33,36 +37,52 @@ public class ACLMatchingCriteria implements Serializable {
     this.id = id;
   }
 
-  public String getSourceIP() {
-    return source_ip;
+  public String getSourceIPPrefix() {
+    return source_ip_prefix;
   }
 
-  public void setSourceIP(String src_ip) {
-    this.source_ip = src_ip;
+  public void setSourceIPPrefix(String src_ip_prefix) {
+    this.source_ip_prefix = src_ip_prefix;
   }
 
-  public String getDestinationIP() {
-    return destination_ip;
+  public String getDestinationIPPrefix() {
+    return destination_ip_prefix;
   }
 
-  public void setDestinationIP(String dest_ip) {
-    this.destination_ip = dest_ip;
+  public void setDestinationIPPrefix(String dest_ip_prefix) {
+    this.destination_ip_prefix = dest_ip_prefix;
   }
 
-  public int getSourcePort() {
-    return source_port;
+  public int getSourcePortMin() {
+    return source_port_min;
   }
 
-  public void setSourcePort(int src_port) {
-    this.source_port = src_port;
+  public void setSourcePortMin(int source_port_min) {
+    this.source_port_min = source_port_min;
   }
 
-  public int getDestinationPort() {
-    return destination_port;
+  public int getSourcePortMax() {
+    return source_port_max;
   }
 
-  public void setDestinationPort(int dest_port) {
-    this.destination_port = dest_port;
+  public void setSourcePortMax(int source_port_max) {
+    this.source_port_max = source_port_max;
+  }
+
+  public int getDestinationPortMin() {
+    return destination_port_min;
+  }
+
+  public void setDestinationPortMin(int destination_port_min) {
+    this.destination_port_min = destination_port_min;
+  }
+
+  public int getDestinationPortMax() {
+    return destination_port_max;
+  }
+
+  public void setDestinationPortMax(int destination_port_max) {
+    this.destination_port_max = destination_port_max;
   }
 
   public int getProtocol() {
