@@ -17,6 +17,8 @@
 
 package org.openbaton.tosca.templates.TopologyTemplate.Nodes;
 
+import java.util.List;
+
 /** Created by rvl on 17.08.16. */
 public class NodeTemplate {
 
@@ -27,6 +29,10 @@ public class NodeTemplate {
   private Object attributes = null;
   private Object artifacts = null;
   private Object interfaces = null;
+
+  //added for VNFFG
+  private String description = null;
+  private List<String> members = null;
 
   public String getType() {
     return type;
@@ -84,28 +90,45 @@ public class NodeTemplate {
     this.interfaces = interfaces;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public List<String> getMembers() {
+    return members;
+  }
+
+  public void setMembers(List<String> members) {
+    this.members = members;
+  }
+
   @Override
   public String toString() {
-    return "Node: \n"
-        + "type: "
+    return "NodeTemplate{"
+        + "type='"
         + type
-        + "\n"
-        + "Properties: "
-        + properties
-        + "\n"
-        + "Requirements: "
-        + requirements
-        + "\n"
-        + "Capabilities: "
+        + '\''
+        + ", capabilities="
         + capabilities
-        + "\n"
-        + "Interfaces: "
-        + interfaces
-        + "\n"
-        + "Artifacts: "
+        + ", properties="
+        + properties
+        + ", requirements="
+        + requirements
+        + ", attributes="
+        + attributes
+        + ", artifacts="
         + artifacts
-        + "\n"
-        + "Attributes: "
-        + attributes;
+        + ", interfaces="
+        + interfaces
+        + ", description='"
+        + description
+        + '\''
+        + ", members="
+        + members
+        + '}';
   }
 }

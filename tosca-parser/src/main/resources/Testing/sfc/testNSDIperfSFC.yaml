@@ -1,0 +1,202 @@
+tosca_definitions_version: tosca_simple_iperf_scenario
+description: Example of NSD
+
+metadata:
+  ID: dummy-NS
+  vendor: Fokus
+  version: 0.1
+
+topology_template:
+
+  node_templates:
+
+    iperf-server: #VNF1
+        type: openbaton.type.VNF
+        properties:
+          vendor: Fokus
+          version: 0.1
+          endpoint: dummy
+          type: server
+          configurations:
+            name: server-configurations
+            configurationParameters:
+              - key: value
+              - key2: value2
+          vnfPackageLocation: https://gitlab.fokus.fraunhofer.de/openbaton/scripts-test-public.git
+          deploymentFlavour:
+            - flavour_key: m1.small
+            - flavour_key: m1.large
+        requirements:
+          - virtualLink: private
+          - vdu: VDU2
+        interfaces:
+          lifecycle: # lifecycle
+            instantiate:
+              - install.sh
+
+    iperf-fw:
+      type: openbaton.type.VNF
+      properties:
+        ID: x
+        vendor: Fokus
+        version: 0.1
+        type: client
+        vnfPackageLocation: https://gitlab.fokus.fraunhofer.de/openbaton/scripts-test-public.git
+        deploymentFlavour:
+          - flavour_key: m1.small
+        endpoint: dummy
+      requirements:
+         - virtualLink: private
+         - vdu: VDU3
+      interfaces:
+          lifecycle: # lifecycle
+            INSTANTIATE:
+              - install.sh
+            CONFIGURE:
+              - server_configure_only.sh
+            START:
+              - iperf_client_start.sh
+
+    iperf-client:
+      type: openbaton.type.VNF
+      properties:
+        ID: x
+        vendor: Fokus
+        version: 0.1
+        type: client
+        vnfPackageLocation: https://gitlab.fokus.fraunhofer.de/openbaton/scripts-test-public.git
+        deploymentFlavour:
+          - flavour_key: m1.small
+        endpoint: dummy
+      requirements:
+         - virtualLink: ingress_network
+         - vdu: VDU1
+      interfaces:
+          lifecycle: # lifecycle
+            INSTANTIATE:
+              - install.sh
+            CONFIGURE:
+              - server_configure_only.sh
+            START:
+              - iperf_client_start.sh
+
+    VDU1:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        scale_in_out: 1
+        vim_instance_name:
+          - test-vim-instance
+      artifacts:
+        VDU1Image:
+          type: tosca.artifacts.Deployment.Image.VM
+          file: ubuntu-14.04-server-cloudimg-amd64-disk1
+
+    VDU2:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        vm_image:
+          - ubuntu-14.04-server-cloudimg-amd64-disk1
+        scale_in_out: 2
+        vimInstanceName:
+          - test-vim-instance
+      requirements:
+        - virtual_link: CP2
+      artifacts:
+        VDU1Image:
+          type: tosca.artifacts.Deployment.Image.VM
+          file: ubuntu-14.04-server-cloudimg-amd64-disk1
+
+    VDU3:
+      type: tosca.nodes.nfv.VDU
+      properties:
+        vm_image:
+          - ubuntu-14.04-server-cloudimg-amd64-disk1
+        scale_in_out: 1
+        vimInstanceName:
+          - test-vim-instance
+      requirements:
+        - virtual_link: CP3
+        - virtual_link: CP4
+      artifacts:
+        VDU3Image:
+          type: tosca.artifacts.Deployment.Image.VM
+          file: ubuntu-14.04-server-cloudimg-amd64-disk1
+
+    CP1:
+      type: tosca.nodes.nfv.CP
+      properties:
+        floatingIP: random
+      requirements:
+        - virtualBinding: VDU1
+        - virtualLink: ingress_network
+
+    CP2: #endpoints of VNF2
+      type: tosca.nodes.nfv.CP
+      requirements:
+        - virtualBinding: VDU2
+        - virtualLink: private
+
+    CP3: #endpoints of VNF_FW
+      type: tosca.nodes.nfv.CP
+      requirements:
+        - virtualBinding: VDU3
+        - virtualLink: ingress_network
+
+    CP4: #endpoints of VNF_FW
+      type: tosca.nodes.nfv.CP
+      requirements:
+        - virtualBinding: VDU3
+        - virtualLink: egress_network
+
+    ingress_network:
+      type: tosca.nodes.nfv.VL
+      properties:
+        vendor: Fokus
+
+    egress_network:
+      type: tosca.nodes.nfv.VL
+      properties:
+        vendor: Fokus
+
+    forwarding_path1:
+      type: tosca.nodes.nfv.FP
+      #id: 51
+      description: creates path (CP1->CP3->CP4->CP2)
+      properties:
+        policy:
+          type: ACL
+          criteria:
+            dest_port_min: 80
+            dest_port_max: 1024
+            ip_proto: tcp
+            ip_dest: 192.168.1.2
+      requirements:
+        - forwarder: CP1
+        - forwarder: CP3
+        - forwarder: CP4
+        - forwarder: CP2
+
+
+
+    VNFFG:
+      type: tosca.groups.nfv.VNFFG
+      description: VNF forwarding graph
+      members: [ forwarding_path1 ]
+      properties:
+        vendor:
+        version:
+        symmetrical: false
+        cp: [ CP1,CP3,CP4,CP2]
+        vl: [ ingress_network, egress_network]
+        vnf: [ iperf-client, iperf-fw, iperf-server]
+
+
+
+relationships_template:
+  connection_server_client: #DO I NEED THIS AT ALL ?
+    type: tosca.nodes.relationships.ConnectsTo
+    source: iperf-server
+    target: iperf-client
+    parameters:
+        - private
+

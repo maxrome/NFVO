@@ -18,26 +18,26 @@
 package org.openbaton.tosca.parser;
 
 import java.util.*;
-import org.openbaton.catalogue.mano.descriptor.InternalVirtualLink;
-import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
-import org.openbaton.catalogue.mano.descriptor.VNFComponent;
-import org.openbaton.catalogue.mano.descriptor.VNFDConnectionPoint;
-import org.openbaton.catalogue.mano.descriptor.VNFDependency;
-import org.openbaton.catalogue.mano.descriptor.VirtualDeploymentUnit;
-import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
-import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
+import org.openbaton.catalogue.mano.descriptor.*;
 import org.openbaton.catalogue.nfvo.Configuration;
 import org.openbaton.catalogue.nfvo.ConfigurationParameter;
 import org.openbaton.tosca.exceptions.NotFoundException;
+import org.openbaton.tosca.exceptions.ParseException;
 import org.openbaton.tosca.templates.NSDTemplate;
 import org.openbaton.tosca.templates.RelationshipsTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.CP.CPNodeTemplate;
+import org.openbaton.tosca.templates.TopologyTemplate.Nodes.FP.FPACLCriteria;
+import org.openbaton.tosca.templates.TopologyTemplate.Nodes.FP.FPPolicy;
+import org.openbaton.tosca.templates.TopologyTemplate.Nodes.FP.FPTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VDU.VDUNodeTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VL.VLNodeTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VNF.VNFConfigurations;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VNF.VNFNodeTemplate;
+import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VNFFG.VNFFGTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.TopologyTemplate;
 import org.openbaton.tosca.templates.VNFDTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /** Created by rvl on 17.08.16. */
@@ -45,6 +45,8 @@ import org.springframework.stereotype.Service;
 public class TOSCAParser {
 
   public TOSCAParser() {}
+
+  private Logger log = LoggerFactory.getLogger(TOSCAParser.class);
 
   /**
    * Parser of the Virtual Link
@@ -312,7 +314,7 @@ public class TOSCAParser {
    * @return
    */
   public NetworkServiceDescriptor parseNSDTemplate(NSDTemplate nsdTemplate)
-      throws NotFoundException {
+      throws ParseException, NotFoundException {
 
     NetworkServiceDescriptor nsd = new NetworkServiceDescriptor();
 
@@ -343,9 +345,207 @@ public class TOSCAParser {
       nsd.getVld().add(vld);
     }
 
+    // ADD VNFFG
+    nsd.setVnffgd(parseVNFFG(nsdTemplate));
+
     // ADD DEPENDENCIES
     parseRelationships(nsd, nsdTemplate.getRelationships_template());
 
     return nsd;
+  }
+
+  private Set<VNFForwardingGraphDescriptor> parseVNFFG(NSDTemplate nsdTosca)
+      throws NotFoundException, ParseException {
+    List<VNFFGTemplate> vnffgList = nsdTosca.getTopology_template().getVNFFGNodes();
+    if (vnffgList.size() == 0) return null;
+
+    //  Map < VDU , VNF >
+    Map<String, String> vduVnfMap = new HashMap<String, String>();
+    List<VNFNodeTemplate> vnfList = nsdTosca.getTopology_template().getVNFNodes();
+    for (VNFNodeTemplate vnf : vnfList) {
+      for (String vduName : vnf.getRequirements().getVDUS()) {
+        if (vduVnfMap.get(vduName) != null) {
+          throw new ParseException(
+              String.format(
+                  "VDU '%s' is associated with more than one VNF, but to use VNFFG you should associate each VDU to only one VNF",
+                  vduName));
+        }
+        vduVnfMap.put(vduName, vnf.getName());
+      }
+    }
+
+    //Map creation for fast fetching
+    Map<String, VNFFGTemplate> vnffgMap = new HashMap<String, VNFFGTemplate>();
+    Map<String, CPNodeTemplate> cpMap = new HashMap<String, CPNodeTemplate>();
+    Map<String, FPTemplate> fpMap = new HashMap<String, FPTemplate>();
+
+    List<FPTemplate> fpList = nsdTosca.getTopology_template().getFPNodes();
+    List<CPNodeTemplate> cpList = nsdTosca.getTopology_template().getCPNodes();
+
+    for (VNFFGTemplate vnffg : vnffgList) {
+      vnffgMap.put(vnffg.getName(), vnffg);
+    }
+
+    for (CPNodeTemplate cp : cpList) {
+      cpMap.put(cp.getName(), cp);
+    }
+
+    for (FPTemplate fp : fpList) {
+      fpMap.put(fp.getName(), fp);
+    }
+
+    // START PARSING VNFFG
+
+    Set<VNFForwardingGraphDescriptor> vnffgSet = new HashSet<VNFForwardingGraphDescriptor>();
+
+    for (VNFFGTemplate vnffgTemplate : vnffgList) {
+      log.debug("creating VNFFGD");
+
+      VNFForwardingGraphDescriptor vnffgd = new VNFForwardingGraphDescriptor();
+      vnffgd.setVendor(vnffgTemplate.getProperties().getVendor());
+      vnffgd.setVersion(vnffgTemplate.getProperties().getVersion());
+      if (vnffgTemplate.getProperties().getSymmetrical() != null) {
+        vnffgd.setSymmetricity(vnffgTemplate.getProperties().getSymmetrical());
+      } else {
+        vnffgd.setSymmetricity(false);
+      }
+
+      //TODO set number of endpoints and symmetrical
+
+      if (vnffgTemplate.getMembers().size() == 0)
+        throw new ParseException(
+            String.format(
+                "VNFFG with name'%s' should have at least one forwarding path in members list",
+                vnffgTemplate.getName()));
+
+      for (String fpName : vnffgTemplate.getMembers()) {
+        FPTemplate fpTemplate = fpMap.get(fpName);
+        if (fpTemplate == null) {
+          throw new NotFoundException(
+              String.format(
+                  "Cannot find FP with name '%s' listed in 'members' of VNFFG with name '%s'",
+                  fpName, vnffgTemplate.getName()));
+        }
+
+        //building the NetworkForwardingPath
+        NetworkForwardingPath nfp = new NetworkForwardingPath();
+
+        //building the 'connections' array
+        for (int pathIndex = 0;
+            pathIndex < fpTemplate.getRequirements().getForwarderList().size();
+            pathIndex++) {
+          //for (String cpName : fpTemplate.getRequirements().getForwarderList()){
+          String cpName = fpTemplate.getRequirements().getForwarderList().get(pathIndex);
+          CPNodeTemplate cp = cpMap.get(cpName);
+          if (cp == null) {
+            throw new NotFoundException(
+                String.format(
+                    "Cannot find CP with name '%s' listed in requirements of '%s'",
+                    cpName, fpTemplate.getName()));
+          }
+          if (cp.getRequirements().getVirtualBinding() == null
+              || cp.getRequirements().getVirtualBinding().size() == 0) {
+            throw new NotFoundException(
+                String.format(
+                    "CP '%s' must have a 'virtualBinding' in requirements to use VNFFG",
+                    cp.getName()));
+          }
+          if (cp.getRequirements().getVirtualBinding().size() > 1) {
+            throw new NotFoundException(
+                String.format(
+                    "CP '%s' should have only 1 'virtualBinding' in requirements to use VNFFG",
+                    cp.getName()));
+          }
+
+          //get the first CP virtualBinding
+          String vduName = cp.getRequirements().getVirtualBinding().get(0);
+
+          String vnfName = vduVnfMap.get(vduName);
+          if (vnfName == null) {
+            throw new NotFoundException(
+                String.format("VNF '%s' referenced in CP '' not found in descriptor"));
+          }
+
+          if (cp.getRequirements().getVirtualLink() == null
+              || cp.getRequirements().getVirtualLink().size() == 0) {
+            throw new NotFoundException(
+                String.format(
+                    "CP '%s' must have a 'virtualLink' in requirements to use VNFFG",
+                    cp.getName()));
+          }
+          if (cp.getRequirements().getVirtualLink().size() > 1) {
+            throw new NotFoundException(
+                String.format(
+                    "CP '%s' should have only 1 'virtualLink' in requirements to use VNFFG",
+                    cp.getName()));
+          }
+
+          //get the first virtual link
+          String virtualLinkName = cp.getRequirements().getVirtualLink().get(0);
+
+          //put vnfName and virtualLinkName in the network forwarding path
+          Connection conn = new Connection();
+          conn.setVnf_name(vnfName);
+          conn.setVirtual_link(virtualLinkName);
+          conn.setPathIndex(pathIndex);
+          nfp.getConnections().add(conn);
+        }
+
+        //building the policy
+        FPPolicy policy = fpTemplate.getProperties().getPolicy();
+        if (policy == null)
+          throw new NotFoundException(
+              String.format("Cannot find any 'policy' in 'properties' of FP '%s'", fpName));
+
+        FPACLCriteria toscaACL = policy.getAclCriteria();
+        if (toscaACL == null) {
+          throw new NotFoundException(
+              String.format("Cannot find any 'criteria' in 'policy' of FP '%s'", fpName));
+        }
+
+        Policy p = new Policy();
+        ACLMatchingCriteria catalogueACL = new ACLMatchingCriteria();
+
+        if (toscaACL.getIpProto() == null || toscaACL.getIpProto().isEmpty()) {
+          throw new ParseException(
+              String.format("Cannot find 'ip_proto' in 'policy' of FP '%s'", fpName));
+        }
+        catalogueACL.setProtocol(protocolString2Int(toscaACL.getIpProto()));
+
+        catalogueACL.setDestinationIPPrefix(toscaACL.getIpDstPrefix());
+        catalogueACL.setDestinationPortMin(toscaACL.getDestPortMin());
+        catalogueACL.setDestinationPortMax(toscaACL.getDestPortMax());
+        catalogueACL.setSourceIPPrefix(toscaACL.getIpSrcPrefix());
+        catalogueACL.setSourcePortMin(toscaACL.getSrcPortMin());
+        catalogueACL.setSourcePortMax(toscaACL.getSrcPortMax());
+
+        p.setAcl_matching_criteria(catalogueACL);
+
+        nfp.setPolicy(p);
+
+        vnffgd.getNetwork_forwarding_path().add(nfp);
+      }
+
+      vnffgSet.add(vnffgd);
+    }
+
+    return vnffgSet;
+  }
+
+  private int protocolString2Int(String protocol) throws ParseException {
+
+    String proto = protocol.toLowerCase();
+
+    if (proto.equals("icmp")) {
+      return 1;
+    } else if (proto.equals("tcp")) {
+      return 6;
+    } else if (proto.equals("udp")) {
+      return 17;
+    } else {
+      throw new ParseException(
+          String.format(
+              "'%s' is not a valid protocol, allowed values are 'icmp','tcp','udp'", protocol));
+    }
   }
 }

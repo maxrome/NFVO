@@ -49,6 +49,7 @@ import org.openbaton.exceptions.VimException;
 import org.openbaton.nfvo.core.interfaces.VNFPackageManagement;
 import org.openbaton.nfvo.repositories.VNFDRepository;
 import org.openbaton.nfvo.repositories.VnfPackageRepository;
+import org.openbaton.tosca.exceptions.ParseException;
 import org.openbaton.tosca.templates.NSDTemplate;
 import org.openbaton.tosca.templates.VNFDTemplate;
 import org.openbaton.utils.Utils;
@@ -265,9 +266,9 @@ public class CSARParser {
   }
 
   public NetworkServiceDescriptor onboardNSD(byte[] bytes, String projectId)
-      throws NotFoundException, PluginException, VimException, IOException, IncompatibleVNFPackage,
-          org.openbaton.tosca.exceptions.NotFoundException, BadRequestException,
-          AlreadyExistingException, BadFormatException, InterruptedException,
+      throws NotFoundException, ParseException, PluginException, VimException, IOException,
+          IncompatibleVNFPackage, org.openbaton.tosca.exceptions.NotFoundException,
+          BadRequestException, AlreadyExistingException, BadFormatException, InterruptedException,
           EntityUnreachableException {
 
     File temp = File.createTempFile("CSAR", null);

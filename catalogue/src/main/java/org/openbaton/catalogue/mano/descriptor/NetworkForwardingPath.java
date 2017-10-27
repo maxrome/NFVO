@@ -17,6 +17,7 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.persistence.*;
 import org.openbaton.catalogue.util.BaseEntity;
@@ -43,7 +44,9 @@ public class NetworkForwardingPath extends BaseEntity {
   @OrderBy("pathIndex")
   private Set<Connection> connections;
 
-  public NetworkForwardingPath() {}
+  public NetworkForwardingPath() {
+    connections = new LinkedHashSet<Connection>();
+  }
 
   public Policy getPolicy() {
     return policy;

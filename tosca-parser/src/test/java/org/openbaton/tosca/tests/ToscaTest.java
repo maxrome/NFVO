@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.tosca.exceptions.NotFoundException;
+import org.openbaton.tosca.exceptions.ParseException;
 import org.openbaton.tosca.parser.TOSCAParser;
 import org.openbaton.tosca.templates.NSDTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.CP.CPNodeTemplate;
@@ -40,6 +41,28 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 /** Created by rvl on 16.08.16. */
 public class ToscaTest {
+
+  @Test
+  public void testNSDIperfSFCTemplate()
+      throws FileNotFoundException, NotFoundException, ParseException {
+
+    InputStream nsdFile =
+        new FileInputStream(new File("src/main/resources/Testing/sfc/testNSDIperfSFC.yaml"));
+
+    Constructor constructor = new Constructor(NSDTemplate.class);
+    TypeDescription typeDescription = new TypeDescription(NSDTemplate.class);
+    constructor.addTypeDescription(typeDescription);
+
+    Yaml yaml = new Yaml(constructor);
+    NSDTemplate nsdInput = yaml.loadAs(nsdFile, NSDTemplate.class);
+
+    TOSCAParser parser = new TOSCAParser();
+
+    NetworkServiceDescriptor nsd = parser.parseNSDTemplate(nsdInput);
+
+    Gson gson = new Gson();
+    System.out.println(gson.toJson(nsd));
+  }
 
   @Test
   public void testVNFDTemplate() throws FileNotFoundException {
@@ -193,7 +216,8 @@ public class ToscaTest {
   }
 
   @Test
-  public void testNSDIperfTemplate() throws FileNotFoundException, NotFoundException {
+  public void testNSDIperfTemplate()
+      throws FileNotFoundException, NotFoundException, ParseException {
 
     InputStream nsdFile =
         new FileInputStream(new File("src/main/resources/Testing/testNSDIperf.yaml"));
@@ -214,7 +238,7 @@ public class ToscaTest {
   }
 
   @Test
-  public void testMultipleVLs() throws FileNotFoundException, NotFoundException {
+  public void testMultipleVLs() throws FileNotFoundException, NotFoundException, ParseException {
 
     InputStream nsdFile =
         new FileInputStream(new File("src/main/resources/Testing/tosca-ns-example.yaml"));
@@ -235,7 +259,8 @@ public class ToscaTest {
   }
 
   @Test
-  public void testNSDIperfASTemplate() throws FileNotFoundException, NotFoundException {
+  public void testNSDIperfASTemplate()
+      throws FileNotFoundException, NotFoundException, ParseException {
 
     InputStream nsdFile =
         new FileInputStream(new File("src/main/resources/Testing/testNSDIperfAutoscaling.yaml"));

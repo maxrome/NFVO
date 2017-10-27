@@ -30,6 +30,7 @@ import org.openbaton.exceptions.NotFoundException;
 import org.openbaton.exceptions.PluginException;
 import org.openbaton.exceptions.VimException;
 import org.openbaton.nfvo.core.interfaces.NetworkServiceDescriptorManagement;
+import org.openbaton.tosca.exceptions.ParseException;
 import org.openbaton.tosca.parser.TOSCAParser;
 import org.openbaton.tosca.templates.NSDTemplate;
 import org.openbaton.utils.Utils;
@@ -60,9 +61,9 @@ public class RestToscaNetworkServiceDescriptor {
       @RequestBody String nsd_yaml, @RequestHeader(value = "project-id") String projectId)
       throws NetworkServiceIntegrityException, BadFormatException, NotFoundException,
           CyclicDependenciesException, EntityInUseException,
-          org.openbaton.tosca.exceptions.NotFoundException, BadRequestException, IOException,
-          AlreadyExistingException, PluginException, IncompatibleVNFPackage, VimException,
-          InterruptedException, EntityUnreachableException {
+          org.openbaton.tosca.exceptions.NotFoundException, ParseException, BadRequestException,
+          IOException, AlreadyExistingException, PluginException, IncompatibleVNFPackage,
+          VimException, InterruptedException, EntityUnreachableException {
 
     NSDTemplate nsdTemplate = Utils.stringToNSDTemplate(nsd_yaml);
     NetworkServiceDescriptor nsd = toscaParser.parseNSDTemplate(nsdTemplate);

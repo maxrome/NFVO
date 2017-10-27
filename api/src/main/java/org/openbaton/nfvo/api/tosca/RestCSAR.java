@@ -40,6 +40,7 @@ import org.openbaton.exceptions.PluginException;
 import org.openbaton.exceptions.VimException;
 import org.openbaton.nfvo.core.interfaces.NetworkServiceDescriptorManagement;
 import org.openbaton.nfvo.core.interfaces.VNFPackageManagement;
+import org.openbaton.tosca.exceptions.ParseException;
 import org.openbaton.tosca.parser.CSARParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,11 +169,11 @@ public class RestCSAR {
   )
   public String marketDownloadNS(
       @RequestBody JsonObject link, @RequestHeader(value = "project-id") String projectId)
-      throws IOException, PluginException, VimException, NotFoundException, IncompatibleVNFPackage,
-          NetworkServiceIntegrityException, BadFormatException, CyclicDependenciesException,
-          EntityInUseException, org.openbaton.tosca.exceptions.NotFoundException,
-          BadRequestException, AlreadyExistingException, InterruptedException,
-          EntityUnreachableException {
+      throws IOException, PluginException, VimException, NotFoundException, ParseException,
+          IncompatibleVNFPackage, NetworkServiceIntegrityException, BadFormatException,
+          CyclicDependenciesException, EntityInUseException,
+          org.openbaton.tosca.exceptions.NotFoundException, BadRequestException,
+          AlreadyExistingException, InterruptedException, EntityUnreachableException {
     Gson gson = new Gson();
     JsonObject jsonObject = gson.fromJson(link, JsonObject.class);
     if (!jsonObject.has("link"))

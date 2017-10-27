@@ -22,11 +22,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.openbaton.tosca.exceptions.NotFoundException;
+import org.openbaton.tosca.exceptions.ParseException;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.CP.CPNodeTemplate;
+import org.openbaton.tosca.templates.TopologyTemplate.Nodes.FP.FPTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.NodeTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VDU.VDUNodeTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VL.VLNodeTemplate;
 import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VNF.VNFNodeTemplate;
+import org.openbaton.tosca.templates.TopologyTemplate.Nodes.VNFFG.VNFFGTemplate;
 
 /** Created by rvl on 17.08.16. */
 public class TopologyTemplate {
@@ -59,7 +62,7 @@ public class TopologyTemplate {
       NodeTemplate n = node_templates.get(nodeName);
       if (Objects.equals(n.getType(), "tosca.nodes.nfv.CP")) {
 
-        CPNodeTemplate cpNode = new CPNodeTemplate(n);
+        CPNodeTemplate cpNode = new CPNodeTemplate(n, nodeName);
         cpNodes.add(cpNode);
       }
     }
@@ -114,6 +117,32 @@ public class TopologyTemplate {
     }
 
     return vnfNodes;
+  }
+
+  public List<VNFFGTemplate> getVNFFGNodes() throws NotFoundException {
+    List<VNFFGTemplate> vnffgNodes = new ArrayList<VNFFGTemplate>();
+    for (String nodeName : node_templates.keySet()) {
+      NodeTemplate n = node_templates.get(nodeName);
+      if (Objects.equals(n.getType(), "tosca.groups.nfv.VNFFG")) {
+
+        VNFFGTemplate vnfFFGNode = new VNFFGTemplate(n, nodeName);
+        vnffgNodes.add(vnfFFGNode);
+      }
+    }
+    return vnffgNodes;
+  }
+
+  public List<FPTemplate> getFPNodes() throws NotFoundException, ParseException {
+    List<FPTemplate> fpNodes = new ArrayList<FPTemplate>();
+    for (String nodeName : node_templates.keySet()) {
+      NodeTemplate n = node_templates.get(nodeName);
+      if (Objects.equals(n.getType(), "tosca.nodes.nfv.FP")) {
+
+        FPTemplate fpNode = new FPTemplate(n, nodeName);
+        fpNodes.add(fpNode);
+      }
+    }
+    return fpNodes;
   }
 
   @Override
