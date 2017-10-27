@@ -17,6 +17,7 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
 import org.openbaton.catalogue.mano.common.ConnectionPoint;
@@ -50,9 +51,9 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
    * Count of the external endpoints (connection_point elements) included in this VNFFG, to form an
    * index
    */
-  private int number_of_endpoints;
+  private Integer number_of_endpoints;
   /** Count of the VLs (dependent_virtual_link elements) used by this VNFFG, to form an index */
-  private int number_of_virtual_links;
+  private Integer number_of_virtual_links;
   /** Reference to a VLD (vld:id) used to instantiate this Forwarding Graph */
   @OneToMany(cascade = CascadeType.ALL)
   private Set<VirtualLinkDescriptor> dependent_virtual_link;
@@ -81,7 +82,9 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
   @OneToOne(cascade = CascadeType.ALL)
   private Security vnffgd_security;
 
-  public VNFForwardingGraphDescriptor() {}
+  public VNFForwardingGraphDescriptor() {
+    this.network_forwarding_path = new HashSet<NetworkForwardingPath>();
+  }
 
   public String getVendor() {
     return vendor;
@@ -107,19 +110,19 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
     this.symmetrical = sym;
   }
 
-  public int getNumber_of_endpoints() {
+  public Integer getNumber_of_endpoints() {
     return number_of_endpoints;
   }
 
-  public void setNumber_of_endpoints(int number_of_endpoints) {
+  public void setNumber_of_endpoints(Integer number_of_endpoints) {
     this.number_of_endpoints = number_of_endpoints;
   }
 
-  public int getNumber_of_virtual_links() {
+  public Integer getNumber_of_virtual_links() {
     return number_of_virtual_links;
   }
 
-  public void setNumber_of_virtual_links(int number_of_virtual_links) {
+  public void setNumber_of_virtual_links(Integer number_of_virtual_links) {
     this.number_of_virtual_links = number_of_virtual_links;
   }
 
