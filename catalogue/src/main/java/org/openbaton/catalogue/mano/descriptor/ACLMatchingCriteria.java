@@ -19,13 +19,13 @@ public class ACLMatchingCriteria implements Serializable {
   //should be a CIDR (eg. 192.168.1.11/32)
   private String destination_ip_prefix;
 
-  private int source_port_min;
-  private int source_port_max;
+  private Integer source_port_min;
+  private Integer source_port_max;
 
-  private int destination_port_min;
-  private int destination_port_max;
+  private Integer destination_port_min;
+  private Integer destination_port_max;
 
-  private int protocol;
+  private Integer protocol;
 
   public ACLMatchingCriteria() {}
 
@@ -53,43 +53,43 @@ public class ACLMatchingCriteria implements Serializable {
     this.destination_ip_prefix = dest_ip_prefix;
   }
 
-  public int getSourcePortMin() {
+  public Integer getSourcePortMin() {
     return source_port_min;
   }
 
-  public void setSourcePortMin(int source_port_min) {
+  public void setSourcePortMin(Integer source_port_min) {
     this.source_port_min = source_port_min;
   }
 
-  public int getSourcePortMax() {
+  public Integer getSourcePortMax() {
     return source_port_max;
   }
 
-  public void setSourcePortMax(int source_port_max) {
+  public void setSourcePortMax(Integer source_port_max) {
     this.source_port_max = source_port_max;
   }
 
-  public int getDestinationPortMin() {
+  public Integer getDestinationPortMin() {
     return destination_port_min;
   }
 
-  public void setDestinationPortMin(int destination_port_min) {
+  public void setDestinationPortMin(Integer destination_port_min) {
     this.destination_port_min = destination_port_min;
   }
 
-  public int getDestinationPortMax() {
+  public Integer getDestinationPortMax() {
     return destination_port_max;
   }
 
-  public void setDestinationPortMax(int destination_port_max) {
+  public void setDestinationPortMax(Integer destination_port_max) {
     this.destination_port_max = destination_port_max;
   }
 
-  public int getProtocol() {
+  public Integer getProtocol() {
     return protocol;
   }
 
-  public void setProtocol(int protocol) {
+  public void setProtocol(Integer protocol) {
     this.protocol = protocol;
   }
 
