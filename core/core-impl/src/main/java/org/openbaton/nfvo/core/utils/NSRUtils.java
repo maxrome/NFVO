@@ -249,16 +249,20 @@ public class NSRUtils {
       NetworkForwardingPath newNetworkForwardingPath = new NetworkForwardingPath();
       Policy newPolicy = new Policy();
       ACLMatchingCriteria newACL = new ACLMatchingCriteria();
-      newACL.setDestinationIP(
-          networkForwardingPath.getPolicy().getAcl_matching_criteria().getDestinationIP());
-      newACL.setSourceIP(
-          networkForwardingPath.getPolicy().getAcl_matching_criteria().getSourceIP());
+      newACL.setDestinationPortMin(
+          networkForwardingPath.getPolicy().getAcl_matching_criteria().getDestinationPortMin());
+      newACL.setDestinationPortMax(
+          networkForwardingPath.getPolicy().getAcl_matching_criteria().getDestinationPortMax());
+      newACL.setSourcePortMin(
+          networkForwardingPath.getPolicy().getAcl_matching_criteria().getSourcePortMin());
+      newACL.setSourcePortMax(
+          networkForwardingPath.getPolicy().getAcl_matching_criteria().getSourcePortMax());
+      newACL.setDestinationIPPrefix(
+          networkForwardingPath.getPolicy().getAcl_matching_criteria().getDestinationIPPrefix());
+      newACL.setSourceIPPrefix(
+          networkForwardingPath.getPolicy().getAcl_matching_criteria().getSourceIPPrefix());
       newACL.setProtocol(
           networkForwardingPath.getPolicy().getAcl_matching_criteria().getProtocol());
-      newACL.setDestinationPort(
-          networkForwardingPath.getPolicy().getAcl_matching_criteria().getDestinationPort());
-      newACL.setSourcePort(
-          networkForwardingPath.getPolicy().getAcl_matching_criteria().getSourcePort());
       newPolicy.setAcl_matching_criteria(newACL);
       //newPolicy.setQoSLevel(networkForwardingPath.getPolicy().getQoSLevel());
       newNetworkForwardingPath.setPolicy(newPolicy);
