@@ -25,11 +25,11 @@ public interface VnfStateHandler {
       throws NotFoundException, BadFormatException, ExecutionException, InterruptedException;
 
   @Async
-  Future<String> executeAction(Future<NFVMessage> nfvMessage)
+  Future<NFVMessage> executeAction(Future<NFVMessage> nfvMessage)
       throws ExecutionException, InterruptedException;
 
   @Async
-  Future<String> executeAction(NFVMessage nfvMessage)
+  Future<NFVMessage> executeAction(NFVMessage nfvMessage)
       throws ExecutionException, InterruptedException;
 
   void terminate(VirtualNetworkFunctionRecord virtualNetworkFunctionRecord);

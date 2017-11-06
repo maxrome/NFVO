@@ -18,6 +18,7 @@
 package org.openbaton.nfvo.core.test;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
@@ -184,7 +185,7 @@ public class NetworkServiceRecordManagementClassSuiteTest {
                 add(vnfmManagerEndpoint);
               }
             });
-    when(vimManagement.refresh(any(VimInstance.class))).thenReturn(vimInstance);
+    when(vimManagement.refresh(any(VimInstance.class), anyBoolean())).thenReturn(vimInstance);
     when(vnfPackageRepository.findFirstById(anyString())).thenReturn(createVNFPackage());
     log.info("Starting test");
   }
@@ -310,7 +311,7 @@ public class NetworkServiceRecordManagementClassSuiteTest {
         networkServiceDescriptor.getVnfd().iterator().next();
     LifecycleEvent event = new LifecycleEvent();
     event.setEvent(Event.INSTANTIATE);
-    //event.setLifecycle_events(new LinkedHashSet<>());
+    event.setLifecycle_events(new ArrayList<>());
     event.getLifecycle_events().add("command_1");
     virtualNetworkFunctionDescriptor.getLifecycle_event().add(event);
     final VimInstance vimInstance = createVimInstance();
@@ -369,7 +370,7 @@ public class NetworkServiceRecordManagementClassSuiteTest {
         networkServiceDescriptor.getVnfd().iterator().next();
     LifecycleEvent event = new LifecycleEvent();
     event.setEvent(Event.ALLOCATE);
-    //event.setLifecycle_events(new LinkedHashSet<>());
+    event.setLifecycle_events(new ArrayList<>());
     event.getLifecycle_events().add("command_1");
     virtualNetworkFunctionDescriptor.getLifecycle_event().add(event);
     final VimInstance vimInstance = createVimInstance();
@@ -496,7 +497,6 @@ public class NetworkServiceRecordManagementClassSuiteTest {
                   }
                 });
             HighAvailability highAvailability = new HighAvailability();
-            highAvailability.setGeoRedundancy(false);
             highAvailability.setRedundancyScheme("1:N");
             highAvailability.setResiliencyLevel(ResiliencyLevel.ACTIVE_STANDBY_STATELESS);
             vdu.setHigh_availability(highAvailability);
@@ -553,7 +553,6 @@ public class NetworkServiceRecordManagementClassSuiteTest {
           {
             VirtualDeploymentUnit vdu = new VirtualDeploymentUnit();
             HighAvailability highAvailability = new HighAvailability();
-            highAvailability.setGeoRedundancy(false);
             highAvailability.setRedundancyScheme("1:N");
             highAvailability.setResiliencyLevel(ResiliencyLevel.ACTIVE_STANDBY_STATELESS);
             vdu.setHigh_availability(highAvailability);

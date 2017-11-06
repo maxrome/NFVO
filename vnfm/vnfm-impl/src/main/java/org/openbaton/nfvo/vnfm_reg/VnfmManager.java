@@ -142,8 +142,7 @@ public class VnfmManager
   }
 
   @Override
-  @Async
-  public Future<Void> deploy(
+  public void deploy(
       NetworkServiceDescriptor networkServiceDescriptor,
       NetworkServiceRecord networkServiceRecord,
       DeployNSRBody body,
@@ -156,7 +155,7 @@ public class VnfmManager
       log.debug(
           "Parameter ordered set to "
               + ordered
-              + ".Consider changing it directly into the openbaton.properties file");
+              + ".Consider changing it directly into the openbaton-nfvo.properties file");
       if (ordered) {
         vnfrNames.put(networkServiceRecord.getId(), new HashMap<String, Integer>());
         Map<String, Integer> vnfrNamesWeighted = vnfrNames.get(networkServiceRecord.getId());
@@ -170,8 +169,6 @@ public class VnfmManager
         vnfStateHandler.handleVNF(
             networkServiceDescriptor, networkServiceRecord, body, vduVimInstances, vnfd);
       }
-
-      return new AsyncResult<>(null);
     } catch (BadFormatException e) {
       e.printStackTrace();
       throw e;

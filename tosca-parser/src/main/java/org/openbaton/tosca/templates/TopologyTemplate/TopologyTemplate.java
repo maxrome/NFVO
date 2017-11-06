@@ -60,7 +60,7 @@ public class TopologyTemplate {
     for (String nodeName : node_templates.keySet()) {
 
       NodeTemplate n = node_templates.get(nodeName);
-      if (Objects.equals(n.getType(), "tosca.nodes.nfv.CP")) {
+      if (Objects.equals(n.getType().toLowerCase(), "tosca.nodes.nfv.cp")) {
 
         CPNodeTemplate cpNode = new CPNodeTemplate(n, nodeName);
         cpNodes.add(cpNode);
@@ -76,7 +76,7 @@ public class TopologyTemplate {
     for (String nodeName : node_templates.keySet()) {
 
       NodeTemplate n = node_templates.get(nodeName);
-      if (Objects.equals(n.getType(), "tosca.nodes.nfv.VDU")) {
+      if (Objects.equals(n.getType().toLowerCase(), "tosca.nodes.nfv.vdu")) {
 
         VDUNodeTemplate vduNode = new VDUNodeTemplate(n, nodeName);
         vduNodes.add(vduNode);
@@ -93,7 +93,7 @@ public class TopologyTemplate {
     for (String nodeName : node_templates.keySet()) {
 
       NodeTemplate n = node_templates.get(nodeName);
-      if (Objects.equals(n.getType(), "tosca.nodes.nfv.VL")) {
+      if (Objects.equals(n.getType().toLowerCase(), "tosca.nodes.nfv.vl")) {
         VLNodeTemplate vduNode = new VLNodeTemplate(n, nodeName);
         vlNodes.add(vduNode);
       }
@@ -109,7 +109,7 @@ public class TopologyTemplate {
     for (String nodeName : node_templates.keySet()) {
 
       NodeTemplate n = node_templates.get(nodeName);
-      if (Objects.equals(n.getType(), "openbaton.type.VNF")) {
+      if (Objects.equals(n.getType().toLowerCase(), "openbaton.type.vnf")) {
 
         VNFNodeTemplate vnfNode = new VNFNodeTemplate(n, nodeName);
         vnfNodes.add(vnfNode);

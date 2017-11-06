@@ -86,10 +86,10 @@ public class VNFForwardingGraphRecord extends BaseEntity {
 
   private String vendor;
   private String version;
-  private int number_of_endpoints;
-  private int number_of_vnfs;
-  private int number_of_pnfs;
-  private int number_of_virtual_links;
+  private Integer number_of_endpoints;
+  private Integer number_of_vnfs;
+  private Integer number_of_pnfs;
+  private Integer number_of_virtual_links;
   private boolean symmetrical;
 
   public VNFForwardingGraphDescriptor getDescriptor_reference() {
@@ -188,35 +188,35 @@ public class VNFForwardingGraphRecord extends BaseEntity {
     this.version = version;
   }
 
-  public int getNumber_of_endpoints() {
+  public Integer getNumber_of_endpoints() {
     return number_of_endpoints;
   }
 
-  public void setNumber_of_endpoints(int number_of_endpoints) {
+  public void setNumber_of_endpoints(Integer number_of_endpoints) {
     this.number_of_endpoints = number_of_endpoints;
   }
 
-  public int getNumber_of_vnfs() {
+  public Integer getNumber_of_vnfs() {
     return number_of_vnfs;
   }
 
-  public void setNumber_of_vnfs(int number_of_vnfs) {
+  public void setNumber_of_vnfs(Integer number_of_vnfs) {
     this.number_of_vnfs = number_of_vnfs;
   }
 
-  public int getNumber_of_pnfs() {
+  public Integer getNumber_of_pnfs() {
     return number_of_pnfs;
   }
 
-  public void setNumber_of_pnfs(int number_of_pnfs) {
+  public void setNumber_of_pnfs(Integer number_of_pnfs) {
     this.number_of_pnfs = number_of_pnfs;
   }
 
-  public int getNumber_of_virtual_links() {
+  public Integer getNumber_of_virtual_links() {
     return number_of_virtual_links;
   }
 
-  public void setNumber_of_virtual_links(int number_of_virtual_links) {
+  public void setNumber_of_virtual_links(Integer number_of_virtual_links) {
     this.number_of_virtual_links = number_of_virtual_links;
   }
 

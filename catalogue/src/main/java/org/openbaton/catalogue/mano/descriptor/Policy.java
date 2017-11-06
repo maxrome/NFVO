@@ -17,7 +17,10 @@
 
 package org.openbaton.catalogue.mano.descriptor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
 import org.openbaton.catalogue.util.BaseEntity;
 
 /**
@@ -30,6 +33,7 @@ import org.openbaton.catalogue.util.BaseEntity;
 @Entity
 public class Policy extends BaseEntity {
 
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   private ACLMatchingCriteria acl_matching_criteria;
 
   public ACLMatchingCriteria getAcl_matching_criteria() {

@@ -55,16 +55,16 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
   /** Count of the VLs (dependent_virtual_link elements) used by this VNFFG, to form an index */
   private Integer number_of_virtual_links;
   /** Reference to a VLD (vld:id) used to instantiate this Forwarding Graph */
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Set<VirtualLinkDescriptor> dependent_virtual_link;
   /** This element describes a Network Forwarding Path within the VNFFG */
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Set<NetworkForwardingPath> network_forwarding_path;
   /**
    * Reference to Connection Points (nsd/vnfd/pnfd:connection_point:id) forming the VNFFG including
    * Connection Points attached to PNFs
    */
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Set<ConnectionPoint> connection_point;
   /** Version of this VNFFGD */
   private String descriptor_version;
@@ -72,7 +72,7 @@ public class VNFForwardingGraphDescriptor extends BaseEntity {
    * Reference to a VNFD (nsd:deployment_flavours:constituent_vnf:id) used to instantiate this VNF
    * Forwarding Graph
    */
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Set<CostituentVNF> constituent_vnfs;
   /**
    * This is a signature of vnffgd to prevent tampering. The particular hash algorithm used to

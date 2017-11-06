@@ -29,10 +29,10 @@ public class NFVImage extends BaseEntity {
 
   private String extId;
   private String name;
-  private long minRam; //in MB
-  private long minDiskSpace; //in GB
+  private Long minRam = 0L;; //in MB
+  private Long minDiskSpace = 0L; //in GB
   private String minCPU;
-  private boolean isPublic;
+  private Boolean isPublic = false;
   private String diskFormat;
   private String containerFormat;
 
@@ -102,11 +102,19 @@ public class NFVImage extends BaseEntity {
     this.updated = updated;
   }
 
-  public boolean isPublic() {
+  public Boolean isPublic() {
     return isPublic;
   }
 
-  public void setIsPublic(boolean isPublic) {
+  public Boolean getIsPublic() {
+    return isPublic;
+  }
+
+  public void setIsPublic(Boolean isPublic) {
+    this.isPublic = isPublic;
+  }
+
+  public void setPublic(Boolean isPublic) {
     this.isPublic = isPublic;
   }
 

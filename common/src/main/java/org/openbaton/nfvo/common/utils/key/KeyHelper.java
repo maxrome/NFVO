@@ -17,16 +17,16 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
-import java.util.Random;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.text.RandomStringGenerator;
+import org.openbaton.exceptions.BadFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,14 +37,21 @@ public class KeyHelper {
 
   public static String DESEDE_ALGORITHM = "DESede";
   private static String AES_ALGORITHM = "AES";
+  private static final char[] ALPHANUMERIC =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
 
-  public static String genKey() throws NoSuchAlgorithmException, IOException {
-    // Using Apache Commons RNG for randomness
-    Random rng = new Random();
-    // Generates a 20 code point string, using only the letters a-z
-    RandomStringGenerator generator =
-        new RandomStringGenerator.Builder().withinRange('A', 'z').build();
-    return generator.generate(16);
+  /**
+   * Generates a random String containing 16 alphanumerical characters.
+   *
+   * @return a String containing 16 alphanumerical characters
+   */
+  public static String genKey() {
+    SecureRandom secureRandom = new SecureRandom();
+    StringBuilder stringBuilder = new StringBuilder(16);
+    for (int i = 0; i < 16; i++) {
+      stringBuilder.append(ALPHANUMERIC[secureRandom.nextInt(ALPHANUMERIC.length)]);
+    }
+    return stringBuilder.toString();
   }
 
   private static Key restoreKey(byte[] keyBytes) {
@@ -90,8 +97,7 @@ public class KeyHelper {
   }
 
   private static Key generateKey(byte[] keyValue) {
-    Key key = new SecretKeySpec(keyValue, AES_ALGORITHM);
-    return key;
+    return new SecretKeySpec(keyValue, AES_ALGORITHM);
   }
 
   private static String decrypt(byte[] bytes, Key key)
@@ -140,19 +146,24 @@ public class KeyHelper {
     MessageDigest digest = MessageDigest.getInstance("SHA1");
 
     String start = Hex.encodeHexString(digest.digest(publicKey));
-    String res = new String();
+    StringBuilder res = new StringBuilder();
     for (int i = 0; i < start.length(); i++) {
       if (i != 0 && i % 2 == 0) {
-        res += ":";
+        res.append(":");
       }
-      res += start.charAt(i);
+      res.append(start.charAt(i));
     }
-    log.debug(res);
-    return res;
+    log.debug(res.toString());
+    return res.toString();
   }
 
-  public static byte[] parsePublicKey(String decodedKey) throws UnsupportedEncodingException {
-    decodedKey = decodedKey.split(" ")[1];
+  public static byte[] parsePublicKey(String decodedKey)
+      throws UnsupportedEncodingException, BadFormatException {
+    String[] decodedKeyArray = decodedKey.split(" ");
+    if (decodedKeyArray.length <= 1)
+      throw new BadFormatException(
+          "The public key must have the following format: ssh-rsa [the_public_key]");
+    decodedKey = decodedKeyArray[1];
     return Base64.getDecoder().decode(decodedKey);
   }
 
@@ -199,8 +210,7 @@ public class KeyHelper {
   public static KeyPair generateRSAKey() throws NoSuchAlgorithmException {
     KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
     keyGen.initialize(2048);
-    KeyPair keyPair = keyGen.genKeyPair();
-    return keyPair;
+    return keyGen.genKeyPair();
   }
 
   public static void main(String[] args) throws Exception {

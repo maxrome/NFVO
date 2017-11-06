@@ -1,17 +1,11 @@
 package org.openbaton.catalogue.mano.descriptor;
 
-import java.io.Serializable;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Version;
-import org.openbaton.catalogue.util.IdGenerator;
+import org.openbaton.catalogue.util.BaseEntity;
 
 /** Created by mah on 4/28/16. */
 @Entity
-public class ACLMatchingCriteria implements Serializable {
-  @Id private String id;
-  @Version private int version = 0;
+public class ACLMatchingCriteria extends BaseEntity {
 
   //should be a CIDR (eg. 192.168.1.11/32)
   private String source_ip_prefix;
@@ -28,14 +22,6 @@ public class ACLMatchingCriteria implements Serializable {
   private Integer protocol;
 
   public ACLMatchingCriteria() {}
-
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
 
   public String getSourceIPPrefix() {
     return source_ip_prefix;
@@ -91,10 +77,5 @@ public class ACLMatchingCriteria implements Serializable {
 
   public void setProtocol(Integer protocol) {
     this.protocol = protocol;
-  }
-
-  @PrePersist
-  public void ensureId() {
-    id = IdGenerator.createUUID();
   }
 }

@@ -19,10 +19,12 @@ package org.openbaton.nfvo.api.interceptors;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import com.networknt.schema.ValidationMessage;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -52,13 +54,19 @@ public class SchemaValidatorInterceptor extends HandlerInterceptorAdapter {
       throws Exception {
 
     String requestURL = request.getRequestURL().toString();
+    String requestMethod = request.getMethod();
+    log.trace("Validation of schema for " + requestMethod + " on url: " + request.getRequestURI());
     if (request.getRequestURI().equalsIgnoreCase("/error")) {
+      return true;
+    }
+    //TODO fix the date of the image
+    if (request.getRequestURI().contains("/datacenters") && requestMethod.equalsIgnoreCase("put")) {
       return true;
     }
     CustomHttpServletRequestWrapper wrapper = new CustomHttpServletRequestWrapper(request);
     String requestBody = wrapper.getBody();
     String classSchema = null;
-
+    Class<?> parameterClass = null;
     if (handler instanceof org.springframework.web.method.HandlerMethod) {
       org.springframework.web.method.HandlerMethod handlerMethod =
           (org.springframework.web.method.HandlerMethod) handler;
@@ -68,8 +76,11 @@ public class SchemaValidatorInterceptor extends HandlerInterceptorAdapter {
         Annotation[] methodParameters = annotations[i];
         for (Annotation a : methodParameters) {
           if (a instanceof RequestBody) {
-            Class<?> parameterClass = handlerMethod.getMethod().getParameterTypes()[i];
-            if (!parameterClass.getName().equals("com.google.gson.JsonObject")) {
+            parameterClass = handlerMethod.getMethod().getParameterTypes()[i];
+            if (!parameterClass.getCanonicalName().equals(JsonObject.class.getCanonicalName())
+                && !parameterClass.isPrimitive()
+                && !Modifier.isAbstract(parameterClass.getModifiers())
+                && !parameterClass.getCanonicalName().equals(String.class.getCanonicalName())) {
               classSchema = getJsonSchemaFromClass(parameterClass);
             }
           }
@@ -82,9 +93,9 @@ public class SchemaValidatorInterceptor extends HandlerInterceptorAdapter {
       log.trace("Request url is : " + requestURL);
       Set<ValidationMessage> validationMessages;
       try {
-        if (classSchema.equals(NetworkServiceDescriptor.class.getSimpleName())
-            || classSchema.equals(NetworkServiceDescriptor.class.getName())
-            || classSchema.equals(NetworkServiceDescriptor.class.getCanonicalName())) {
+        if (parameterClass
+            .getCanonicalName()
+            .equals(NetworkServiceDescriptor.class.getCanonicalName())) {
           NetworkServiceDescriptor networkServiceDescriptor =
               gson.fromJson(requestBody, NetworkServiceDescriptor.class);
           if (networkServiceDescriptor
@@ -102,7 +113,8 @@ public class SchemaValidatorInterceptor extends HandlerInterceptorAdapter {
                       try {
                         errors.addAll(
                             SchemaValidator.validateSchema(
-                                VirtualLinkDescriptor.class.getCanonicalName(), gson.toJson(vld)));
+                                getJsonSchemaFromClass(VirtualLinkDescriptor.class),
+                                gson.toJson(vld)));
                       } catch (BadRequestException | IOException e) {
                         e.printStackTrace();
                       }
@@ -115,7 +127,7 @@ public class SchemaValidatorInterceptor extends HandlerInterceptorAdapter {
                       try {
                         errors.addAll(
                             SchemaValidator.validateSchema(
-                                VNFDependency.class.getCanonicalName(),
+                                getJsonSchemaFromClass(VNFDependency.class),
                                 gson.toJson(vnfDependency)));
                       } catch (BadRequestException | IOException e) {
                         e.printStackTrace();
@@ -142,13 +154,14 @@ public class SchemaValidatorInterceptor extends HandlerInterceptorAdapter {
       }
     } else {
       if (!requestURL.contains("/api/v1")
-          && !request.getMethod().equalsIgnoreCase("get")
-          && !request.getMethod().equalsIgnoreCase("delete")) {
+          && !requestMethod.equalsIgnoreCase("get")
+          && !requestMethod.equalsIgnoreCase("delete")) {
         log.warn("Not able to generate schema for url ...");
         log.warn("URL: " + requestURL);
       }
     }
-    return super.preHandle(wrapper, response, handler);
+    boolean b = super.preHandle(wrapper, response, handler);
+    return b;
   }
 
   private void handleErrorMessages(
@@ -180,7 +193,7 @@ public class SchemaValidatorInterceptor extends HandlerInterceptorAdapter {
     JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(mapper);
     JsonNode jsonSchema = schemaGen.generateJsonSchema(javaClass);
     String jsonSchemaAsString = mapper.writeValueAsString(jsonSchema);
-    log.trace(jsonSchemaAsString);
+    log.trace("The schema is: " + jsonSchemaAsString);
     return jsonSchemaAsString;
   }
 }

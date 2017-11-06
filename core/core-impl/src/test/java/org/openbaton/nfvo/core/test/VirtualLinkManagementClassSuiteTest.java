@@ -237,12 +237,12 @@ public class VirtualLinkManagementClassSuiteTest {
           {
             LifecycleEvent lifecycleEvent = new LifecycleEvent();
             lifecycleEvent.setEvent(Event.INSTANTIATE);
-            /* lifecycleEvent.setLifecycle_events(
-            new LinkedHashSet<String>() {
-              {
-                add("command");
-              }
-            });*/
+            lifecycleEvent.setLifecycle_events(
+                new ArrayList<String>() {
+                  {
+                    add("command");
+                  }
+                });
             add(lifecycleEvent);
           }
         });
@@ -358,7 +358,6 @@ public class VirtualLinkManagementClassSuiteTest {
           {
             VirtualDeploymentUnit vdu = new VirtualDeploymentUnit();
             HighAvailability highAvailability = new HighAvailability();
-            highAvailability.setGeoRedundancy(false);
             highAvailability.setRedundancyScheme("1:N");
             highAvailability.setResiliencyLevel(ResiliencyLevel.ACTIVE_STANDBY_STATELESS);
             vdu.setHigh_availability(highAvailability);

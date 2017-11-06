@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import org.apache.commons.net.util.SubnetUtils;
 import org.openbaton.catalogue.api.DeployNSRBody;
@@ -117,8 +116,7 @@ public class NetworkServiceRecordManagement
     implements org.openbaton.nfvo.core.interfaces.NetworkServiceRecordManagement {
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-  private ThreadPoolTaskExecutor asyncExecutor;
-
+  @Autowired private ThreadPoolTaskExecutor asyncExecutor;
   @Autowired private EventDispatcher publisher;
   @Autowired private NetworkServiceRecordRepository nsrRepository;
   @Autowired private NetworkServiceDescriptorRepository nsdRepository;
@@ -156,19 +154,6 @@ public class NetworkServiceRecordManagement
   @Autowired private KeyRepository keyRepository;
   @Autowired private VnfPackageRepository vnfPackageRepository;
   @Autowired private VimManagement vimManagement;
-
-  @PostConstruct
-  private void init() {
-    if (removeAfterTimeout) {
-      asyncExecutor = new ThreadPoolTaskExecutor();
-      asyncExecutor.setThreadNamePrefix("OpenbatonTask-");
-      asyncExecutor.setMaxPoolSize(30);
-      asyncExecutor.setCorePoolSize(5);
-      asyncExecutor.setQueueCapacity(0);
-      asyncExecutor.setKeepAliveSeconds(20);
-      asyncExecutor.initialize();
-    }
-  }
 
   @Override
   public NetworkServiceRecord onboard(
@@ -1094,7 +1079,7 @@ public class NetworkServiceRecordManagement
                         s -> {
                           if (s.equals(vimInstance.getName())) {
                             try {
-                              vimManagement.refresh(vimInstance);
+                              vimManagement.refresh(vimInstance, false);
                             } catch (VimException
                                 | PluginException
                                 | BadRequestException
@@ -1107,7 +1092,7 @@ public class NetworkServiceRecordManagement
                         });
                   } else {
                     try {
-                      vimManagement.refresh(vimInstance);
+                      vimManagement.refresh(vimInstance, false);
                     } catch (VimException
                         | PluginException
                         | BadRequestException
@@ -1119,7 +1104,7 @@ public class NetworkServiceRecordManagement
                   }
                 });
       } else {
-        vimManagement.refresh(vimInstance);
+        vimManagement.refresh(vimInstance, false);
       }
       if (exception[0] != null) {
         throw new VimException(exception[0]);
@@ -1188,7 +1173,7 @@ public class NetworkServiceRecordManagement
 
             if (!vimInstance.getType().equals("test")) {
               boolean found = false;
-              vimManagement.refresh(vimInstance);
+              vimManagement.refresh(vimInstance, false);
 
               for (String imageName : vdu.getVm_image()) {
 
